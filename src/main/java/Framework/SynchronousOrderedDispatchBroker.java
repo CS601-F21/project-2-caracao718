@@ -9,8 +9,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SynchronousOrderedDispatchBroker<T> implements Broker<T> {
 
-    private CopyOnWriteArrayList<Subscriber<T>> subscribers = new CopyOnWriteArrayList<>();
-    private volatile boolean canAccept = true;
+    private final CopyOnWriteArrayList<Subscriber<T>> subscribers;
+    private volatile boolean canAccept;
+
+    public SynchronousOrderedDispatchBroker() {
+        this.subscribers = new CopyOnWriteArrayList<>();
+        this.canAccept = true;
+    }
 
     @Override
     public synchronized void publish(T item) {

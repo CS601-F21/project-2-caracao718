@@ -3,21 +3,20 @@ import Framework.Subscriber;
 
 import java.io.*;
 
-public class NewReviewSubscriber<T> implements Subscriber<T> {
+public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
     private long unixTime;
 
     /**
      * PrintWriter reference: https://www.javatpoint.com/java-printwriter-class
      */
-    private PrintWriter writer = null; // closing the writer??
+    private PrintWriter writer1 = null;
     {
         try {
-            writer = new PrintWriter(new File("newOutput.json"));
+            writer1 = new PrintWriter(new File("newOutput.json"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onEvent(T item) {
@@ -26,9 +25,13 @@ public class NewReviewSubscriber<T> implements Subscriber<T> {
         // if the unixTime is more than 1362268800
         if (unixTime >= 1362268800) {
             // write the line in the output file
-            writer.print(item);
-            writer.flush(); //should I do this? when to close?
+            writer1.print(item);
+            writer1.flush();
         }
     }
 
+    @Override
+    public void closePrintWriter() {
+        writer1.close();
+    }
 }

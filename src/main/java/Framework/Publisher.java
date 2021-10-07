@@ -24,9 +24,10 @@ public class Publisher implements Runnable{
             while ((line = reviewReader.readLine()) != null) {
                 try {
                     Review item = gson.fromJson(line, Review.class);
-                    // publish the item here
                     brokerType.publish(item);
-                } catch(com.google.gson.JsonSyntaxException ignored) {}
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             System.out.println("Error reading file, please try again");

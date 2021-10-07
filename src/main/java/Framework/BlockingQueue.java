@@ -17,9 +17,33 @@ public class BlockingQueue<T> {
         this.size = 0;
     }
 
-//    public synchronized T poll() {
-//
-//    }
+    /**
+     * A method that polls from the waiting queue. If the queue is empty, then the method returns without waiting.
+     * @return
+     */
+    public synchronized T poll(long milliSeconds) {
+        if (size == 0) {
+            try {
+                this.wait(milliSeconds);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        T item = items[start];
+        start = (start+1)%items.length;
+        size--;
+        /*
+        If the queue was previously full and a new slot has now opened
+        notify any waiters in the put method.
+         */
+        if(size == items.length-1) {
+            this.notifyAll();
+        }
+
+        return item;
+    }
 
     /**
      * Queue will block until new item can be inserted.

@@ -1,29 +1,27 @@
 import Framework.*;
 
-/*
- - how to get the time in subscriber
- - check if my syncOrdered implementation is right
- - check the main
- - do I need to specify the type in publisher?
-
- */
 public class BrokerFramework {
 
-    private static SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
-    private static AsyncOrderedDispatchBroker<Review> asyncOrderBroker;
-    private static AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker;
+    private static final SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
+    private static final AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(30000, 100);
+    private static final AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 30000);
 
     public static void main(String[] args) {
 
         // two threads running the Publisher class, one for each file
-        String broker;
-        Publisher apps = new Publisher("test_apps.json", syncOrderBroker);
-        Thread p1 = new Thread(apps);
-        Subscriber<Review> newSub = new NewReviewSubscriber<Review>();
+        String input;
+        Broker<Review> broker;
 
-        Publisher home = new Publisher("test_home.json", syncOrderBroker);
+        long start = System.currentTimeMillis(); //retrieve current time when starting calculations
+
+        Publisher apps = new Publisher("reviews_Apps_for_Android_5.json", syncOrderBroker);
+        Thread p1 = new Thread(apps);
+
+        Publisher home = new Publisher("reviews_Home_and_Kitchen_5.json", syncOrderBroker);
         Thread p2 = new Thread(home);
-        Subscriber<Review> oldSub = new OldReviewSubscriber<Review>();
+
+        AmazonSubscriber<Review> newSub = new NewReviewSubscriber<Review>();
+        AmazonSubscriber<Review> oldSub = new OldReviewSubscriber<Review>();
 
         syncOrderBroker.subscribe(newSub);
         syncOrderBroker.subscribe(oldSub);
@@ -31,14 +29,27 @@ public class BrokerFramework {
         p1.start();
         p2.start();
 
+
         try {
             p1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
             p2.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        syncOrderBroker.shutdown();
+        asyncOrderBroker.shutdown();
+        asyncUnorderBroker.shutdown();
+        newSub.closePrintWriter();
+        oldSub.closePrintWriter();
 
+        long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
+        System.out.println("time: " + (end-start));
 
     }
 }
