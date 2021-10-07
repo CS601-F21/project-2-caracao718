@@ -1,42 +1,34 @@
 package Framework;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A class that synchronously deliver published items to all subscribers. The publish method will not return to the publisher until all subscribers have completed the onEvent method.
  * Items from different publishers may not interleave.
  */
 
-public class SynchronousOrderedDispatchBroker implements Broker { //should implement this as runnable and execute in the main?
+public class SynchronousOrderedDispatchBroker<T> implements Broker<T> {
 
-    private ArrayList<Subscriber> subscribers = new ArrayList<>();
+    private CopyOnWriteArrayList<Subscriber<T>> subscribers = new CopyOnWriteArrayList<>();
+    private volatile boolean canAccept = true;
 
     @Override
-    public void publish(Object item) {
-
-        ExecutorService threadPool = Executors.newFixedThreadPool(50);
-
-        for (Subscriber subscriber : subscribers) {
-            threadPool.execute(subscriber.onEvent(item));
+    public synchronized void publish(T item) {
+        if (canAccept) {
+            for (Subscriber<T> subscriber : subscribers) {
+                subscriber.onEvent(item);
+            }
         }
-
     }
 
     @Override
-    public void subscribe(Subscriber subscriber) {
+    public synchronized void subscribe(Subscriber<T> subscriber) {
         subscribers.add(subscriber);
     }
 
     @Override
     public void shutdown() {
-        threadPool.shutdown();
-        try {
-            threadPool.awaitTermination(2, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // stop accepting new work
+        canAccept = false;
     }
 }

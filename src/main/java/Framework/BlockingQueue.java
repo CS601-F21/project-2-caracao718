@@ -17,9 +17,9 @@ public class BlockingQueue<T> {
         this.size = 0;
     }
 
-    public synchronized T poll() {
-
-    }
+//    public synchronized T poll() {
+//
+//    }
 
     /**
      * Queue will block until new item can be inserted.

@@ -1,22 +1,44 @@
-import Framework.Publisher;
-
-import java.util.Map;
+import Framework.*;
 
 /*
-Questions:
-1. the Publisher class, readFile? etc
-2. Publisher run(), includes all three methods? or how?
-3. how to get the unixTime in subscribers
-4. onEvent is not runnable, so in brokers, how can it be executed?
- */
+ - how to get the time in subscriber
+ - check if my syncOrdered implementation is right
+ - check the main
+ - do I need to specify the type in publisher?
 
+ */
 public class BrokerFramework {
 
-    public static void main(String[] args) {
-        // two threads running the Publisher class, one for each file
-        Publisher.readFile("reviews_Apps_for_Android_5.json");
-        Thread p1 = new Thread() {
+    private static SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
+    private static AsyncOrderedDispatchBroker<Review> asyncOrderBroker;
+    private static AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker;
 
+    public static void main(String[] args) {
+
+        // two threads running the Publisher class, one for each file
+        String broker;
+        Publisher apps = new Publisher("test_apps.json", syncOrderBroker);
+        Thread p1 = new Thread(apps);
+        Subscriber<Review> newSub = new NewReviewSubscriber<Review>();
+
+        Publisher home = new Publisher("test_home.json", syncOrderBroker);
+        Thread p2 = new Thread(home);
+        Subscriber<Review> oldSub = new OldReviewSubscriber<Review>();
+
+        syncOrderBroker.subscribe(newSub);
+        syncOrderBroker.subscribe(oldSub);
+
+        p1.start();
+        p2.start();
+
+        try {
+            p1.join();
+            p2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+
+
     }
 }

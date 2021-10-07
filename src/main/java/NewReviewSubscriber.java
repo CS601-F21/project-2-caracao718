@@ -1,12 +1,34 @@
-import Framework.Publisher;
+import Framework.Review;
 import Framework.Subscriber;
 
-public class NewReviewSubscriber implements Subscriber {
-    @Override
-    public void onEvent(Object item) {
-        // get the unixTime
+import java.io.*;
 
-        // if the unixTime is more than 1362268800
-        // then get the item
+public class NewReviewSubscriber<T> implements Subscriber<T> {
+    private long unixTime;
+
+    /**
+     * PrintWriter reference: https://www.javatpoint.com/java-printwriter-class
+     */
+    private PrintWriter writer = null; // closing the writer??
+    {
+        try {
+            writer = new PrintWriter(new File("newOutput.json"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
+
+
+    @Override
+    public void onEvent(T item) {
+        // get the unixTime
+        unixTime = ((Review)item).getUnixReviewTime();
+        // if the unixTime is more than 1362268800
+        if (unixTime >= 1362268800) {
+            // write the line in the output file
+            writer.print(item);
+            writer.flush(); //should I do this? when to close?
+        }
+    }
+
 }

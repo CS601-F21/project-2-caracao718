@@ -1,19 +1,20 @@
 package Framework;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class AsyncOrderedDispatchBroker implements Broker {
+public class AsyncOrderedDispatchBroker<T> implements Broker<T> {
 
-    private ArrayList<Subscriber> subscribers = new ArrayList<>();
+    private CopyOnWriteArrayList<Subscriber<T>> subscribers = new CopyOnWriteArrayList<>();
 
     @Override
-    public void publish(Object item) {
+    public void publish(T item) {
         // use the BlockingQueue to queue new items as they are being published
+
 
     }
 
     @Override
-    public void subscribe(Subscriber subscriber) {
+    public void subscribe(Subscriber<T> subscriber) {
         subscribers.add(subscriber);
     }
 
