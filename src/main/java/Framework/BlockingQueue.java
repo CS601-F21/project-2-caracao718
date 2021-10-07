@@ -1,5 +1,9 @@
 package Framework;
 
+/**
+ * A class that implements the BlockingQueue
+ * @param <T>
+ */
 public class BlockingQueue<T> {
     private T[] items;
     private int start;
@@ -68,7 +72,10 @@ public class BlockingQueue<T> {
         }
     }
 
-
+    /**
+     * A method that takes from the waiting queue, if there's no items in the queue, it will wait until there's another item in the queue
+     * @return
+     */
     public synchronized T take() {
         while(size == 0) {
             try {
@@ -93,6 +100,10 @@ public class BlockingQueue<T> {
         return item;
     }
 
+    /**
+     * A method that checks if the queue is empty
+     * @return
+     */
     public synchronized boolean isEmpty() {
         return size == 0;
     }

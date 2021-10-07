@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+/**
+ * A class that reads in a file, parse the file to a JSON file, then publish it.
+ */
 public class Publisher implements Runnable{
     private String fileName;
     private Broker<Review> brokerType;
@@ -35,7 +38,9 @@ public class Publisher implements Runnable{
         }
     }
 
-
+    /**
+     * Runnable object to run in a thread
+     */
     @Override
     public void run() {
         publish();

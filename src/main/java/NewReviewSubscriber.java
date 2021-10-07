@@ -1,8 +1,11 @@
 import Framework.Review;
-import Framework.Subscriber;
 
 import java.io.*;
 
+/**
+ * A class that subscribes only to the new reviews
+ * @param <T>
+ */
 public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
     private long unixTime;
 
@@ -18,6 +21,10 @@ public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
         }
     }
 
+    /**
+     * A method that filters out the newer items and print it to the output file
+     * @param item
+     */
     @Override
     public void onEvent(T item) {
         // get the unixTime
@@ -30,6 +37,9 @@ public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
         }
     }
 
+    /**
+     * A method that closes the writer
+     */
     @Override
     public void closePrintWriter() {
         writer1.close();

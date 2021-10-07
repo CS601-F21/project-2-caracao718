@@ -3,7 +3,6 @@ import Framework.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Objects;
 
 public class BrokerFramework {
 
@@ -13,8 +12,8 @@ public class BrokerFramework {
         String second_file_name = args[3];
 
         SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
-        AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(30000, 100);
-        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 30000);
+        AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(30000, 100); // milliseconds and queueSize can be modified
+        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 30000); // threadpool size, queueSize, and milliseconds can be modified
 
         try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
             System.out.println("Please input command as the following: \n" +
