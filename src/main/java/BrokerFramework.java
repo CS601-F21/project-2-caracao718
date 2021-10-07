@@ -1,30 +1,61 @@
 import Framework.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Objects;
+
 public class BrokerFramework {
 
-    private static final SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
-    private static final AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(30000, 100);
-    private static final AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 30000);
-
     public static void main(String[] args) {
+        Broker<Review> broker = null;
+        String first_file_name = args[1];
+        String second_file_name = args[3];
 
-        // two threads running the Publisher class, one for each file
-        String input;
-        Broker<Review> broker;
+        SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
+        AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(30000, 100);
+        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 30000);
+
+        try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
+            System.out.println("Please input command as the following: \n" +
+                    "SynchronousOrderedDispatchBroker\n" +
+                    "AsyncOrderedDispatchBroker\n" +
+                    "AsyncUnorderedDispatchBroker");
+            String input = readCL.readLine();
+            if (input == "exit") {
+                System.exit(0);
+            }
+            System.out.println("Please wait...");
+            switch (input) {
+                case "SynchronousOrderedDispatchBroker" -> broker = syncOrderBroker;
+                case "AsyncOrderedDispatchBroker" -> broker = asyncOrderBroker;
+                case "AsyncUnorderedDispatchBroker" -> broker = asyncUnorderBroker;
+                default -> System.out.println("something wrong with input, please try again");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Something Wrong");
+        }
+
+
 
         long start = System.currentTimeMillis(); //retrieve current time when starting calculations
 
-        Publisher apps = new Publisher("reviews_Apps_for_Android_5.json", syncOrderBroker);
-        Thread p1 = new Thread(apps);
+        if (broker == null) {
+            System.exit(1);
+        }
 
-        Publisher home = new Publisher("reviews_Home_and_Kitchen_5.json", syncOrderBroker);
-        Thread p2 = new Thread(home);
+        Publisher firstFile = new Publisher(first_file_name, broker);
+        Thread p1 = new Thread(firstFile);
+
+        Publisher secondFile = new Publisher(second_file_name, broker);
+        Thread p2 = new Thread(secondFile);
 
         AmazonSubscriber<Review> newSub = new NewReviewSubscriber<Review>();
         AmazonSubscriber<Review> oldSub = new OldReviewSubscriber<Review>();
 
-        syncOrderBroker.subscribe(newSub);
-        syncOrderBroker.subscribe(oldSub);
+        broker.subscribe(newSub);
+        broker.subscribe(oldSub);
 
         p1.start();
         p2.start();
@@ -42,14 +73,16 @@ public class BrokerFramework {
             e.printStackTrace();
         }
 
+        newSub.closePrintWriter();
+        oldSub.closePrintWriter();
         syncOrderBroker.shutdown();
         asyncOrderBroker.shutdown();
         asyncUnorderBroker.shutdown();
-        newSub.closePrintWriter();
-        oldSub.closePrintWriter();
+
 
         long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
         System.out.println("time: " + (end-start));
 
     }
+
 }
