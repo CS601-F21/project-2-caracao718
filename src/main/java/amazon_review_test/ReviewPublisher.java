@@ -1,5 +1,6 @@
 package amazon_review_test;
 
+import com.google.gson.JsonParseException;
 import framework.Broker;
 import com.google.gson.Gson;
 
@@ -29,7 +30,7 @@ public class ReviewPublisher implements Runnable{
                 try {
                     Review item = gson.fromJson(line, Review.class);
                     brokerType.publish(item);
-                } catch(NullPointerException e) {
+                } catch(JsonParseException e) {
                     e.printStackTrace();
                 }
             }

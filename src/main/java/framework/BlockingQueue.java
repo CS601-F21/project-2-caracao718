@@ -34,7 +34,7 @@ public class BlockingQueue<T> {
                 e.printStackTrace();
             }
             long end = System.currentTimeMillis();
-            if ((end - start) < milliSeconds) { // should this be less than or equal to?
+            if ((end - start) < milliSeconds && (size != 0)) {
                 return pollItem();
             } else {
                 return null;

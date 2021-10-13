@@ -31,16 +31,16 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T> {
     @Override
     public void publish(T item) {
         if (running) {
-            threadPool.execute(new publishEach(item));
+            threadPool.execute(new PublishItem(item));
         }
     }
 
     /**
      * A class that implements runnable, and can be executed by a thread. This class delivers items to each subscriber
      */
-    private class publishEach implements Runnable {
+    private class PublishItem implements Runnable {
         T currentItem;
-        public publishEach(T currentItem) {
+        public PublishItem(T currentItem) {
             this.currentItem = currentItem;
         }
 
