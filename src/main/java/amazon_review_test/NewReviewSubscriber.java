@@ -2,6 +2,8 @@ package amazon_review_test;
 
 import java.io.*;
 
+import static amazon_review_test.BrokerFramework.config;
+
 /**
  * A class that subscribes only to the new reviews
  * @param <T>
@@ -15,7 +17,7 @@ public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
     private PrintWriter writer1 = null;
     {
         try {
-            writer1 = new PrintWriter(new File("newOutput.json"));
+            writer1 = new PrintWriter(new File(config.getOutput1()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

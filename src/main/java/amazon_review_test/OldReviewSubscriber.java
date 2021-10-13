@@ -2,6 +2,8 @@ package amazon_review_test;
 
 import java.io.*;
 
+import static amazon_review_test.BrokerFramework.config;
+
 /**
  * A class that subscribes only to the old reviews
  * @param <T>
@@ -15,7 +17,7 @@ public class OldReviewSubscriber<T> implements AmazonSubscriber<T> {
     private PrintWriter writer2 = null;
     {
         try {
-            writer2 = new PrintWriter(new File("oldOutput.json"));
+            writer2 = new PrintWriter(new File(config.getOutput2()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

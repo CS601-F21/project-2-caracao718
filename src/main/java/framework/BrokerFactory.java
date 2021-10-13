@@ -1,11 +1,6 @@
 package framework;
 
 public class BrokerFactory {
-//    String brokerName;
-//
-//    public BrokerFactory(String brokerName) {
-//        this.brokerName = brokerName;
-//    }
 
     public Broker getBroker(String brokerName) {
         if (brokerName.equals("SynchronousOrderedDispatchBroker")) {
