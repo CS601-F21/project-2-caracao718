@@ -73,8 +73,8 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T> {
      */
     @Override
     public void shutdown() {
-        threadPool.shutdown();
         running = false;
+        threadPool.shutdown();
         try {
             threadPool.awaitTermination(300, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {

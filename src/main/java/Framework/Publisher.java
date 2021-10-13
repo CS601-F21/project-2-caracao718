@@ -1,5 +1,6 @@
 package Framework;
 
+import AmazonReviewTest.Review;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -18,7 +19,7 @@ public class Publisher implements Runnable{
     }
 
     /**
-     * A method that reads in a Json file, and publish the items in Framework.Review.
+     * A method that reads in a Json file, and publish the items in AmazonReviewTest.Review.
      */
     private void publish() {
         String line;

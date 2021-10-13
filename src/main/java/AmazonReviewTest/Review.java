@@ -1,4 +1,4 @@
-package Framework;
+package AmazonReviewTest;
 
 import java.util.Arrays;
 

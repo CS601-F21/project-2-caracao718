@@ -1,8 +1,15 @@
+package AmazonReviewTest;
+
+import AmazonReviewTest.AmazonSubscriber;
+import AmazonReviewTest.NewReviewSubscriber;
+import AmazonReviewTest.OldReviewSubscriber;
+import AmazonReviewTest.Review;
 import Framework.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Objects;
 
 public class BrokerFramework {
 
@@ -12,8 +19,8 @@ public class BrokerFramework {
         String second_file_name = args[3];
 
         SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
-        AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(30000, 100); // milliseconds and queueSize can be modified
-        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 30000); // threadpool size, queueSize, and milliseconds can be modified
+        AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(3000, 100); // the milliseconds in wait() and queueSize can be modified
+        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 3000); // threadpool size, queueSize, and milliseconds can be modified
 
         try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
             System.out.println("Please input command as the following: \n" +
@@ -21,7 +28,7 @@ public class BrokerFramework {
                     "AsyncOrderedDispatchBroker\n" +
                     "AsyncUnorderedDispatchBroker");
             String input = readCL.readLine();
-            if (input == "exit") {
+            if (Objects.equals(input, "exit")) {
                 System.exit(0);
             }
             System.out.println("Please wait...");
@@ -72,11 +79,11 @@ public class BrokerFramework {
             e.printStackTrace();
         }
 
-        newSub.closePrintWriter();
-        oldSub.closePrintWriter();
         syncOrderBroker.shutdown();
         asyncOrderBroker.shutdown();
         asyncUnorderBroker.shutdown();
+        newSub.closePrintWriter();
+        oldSub.closePrintWriter();
 
 
         long end = System.currentTimeMillis(); //retrieve current time when finishing calculations

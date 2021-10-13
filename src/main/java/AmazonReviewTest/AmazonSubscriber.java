@@ -1,3 +1,5 @@
+package AmazonReviewTest;
+
 import Framework.Subscriber;
 
 public interface AmazonSubscriber<T> extends Subscriber<T> {
