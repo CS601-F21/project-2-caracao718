@@ -1,6 +1,6 @@
-package Framework;
+package amazon_review_test;
 
-import AmazonReviewTest.Review;
+import framework.Broker;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -9,11 +9,11 @@ import java.io.IOException;
 /**
  * A class that reads in a file, parse the file to a JSON file, then publish it.
  */
-public class Publisher implements Runnable{
+public class ReviewPublisher implements Runnable{
     private String fileName;
     private Broker<Review> brokerType;
 
-    public Publisher(String fileName, Broker<Review> broker) {
+    public ReviewPublisher(String fileName, Broker<Review> broker) {
         this.fileName = fileName;
         this.brokerType = broker;
     }
@@ -29,7 +29,7 @@ public class Publisher implements Runnable{
                 try {
                     Review item = gson.fromJson(line, Review.class);
                     brokerType.publish(item);
-                } catch(Exception e) {
+                } catch(NullPointerException e) {
                     e.printStackTrace();
                 }
             }

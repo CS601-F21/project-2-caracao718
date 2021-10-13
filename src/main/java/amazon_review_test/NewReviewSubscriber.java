@@ -1,7 +1,4 @@
-package AmazonReviewTest;
-
-import AmazonReviewTest.AmazonSubscriber;
-import AmazonReviewTest.Review;
+package amazon_review_test;
 
 import java.io.*;
 

@@ -1,4 +1,4 @@
-package AmazonReviewTest;
+package amazon_review_test;
 
 import java.util.Arrays;
 

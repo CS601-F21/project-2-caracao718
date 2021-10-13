@@ -1,4 +1,4 @@
-package Framework;
+package framework;
 
 /**
  * A class that implements the BlockingQueue

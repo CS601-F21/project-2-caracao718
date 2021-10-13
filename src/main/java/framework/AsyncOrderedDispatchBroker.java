@@ -1,4 +1,4 @@
-package Framework;
+package framework;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -33,7 +33,7 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T> {
      * @param item
      */
     @Override
-    public synchronized void publish(T item) {
+    public void publish(T item) {
         // use the BlockingQueue to queue new items as they are being published
         blockingQueue.put(item);
     }
@@ -44,13 +44,11 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T> {
     private class PoolWorker extends Thread {
         T currentItem;
         public void run() {
-            while (running) {
-                synchronized (blockingQueue) {
-                    currentItem = blockingQueue.poll(milliSeconds);
-                    if (currentItem != null) {
-                        for (Subscriber<T> subscriber : subscribers) {
-                            subscriber.onEvent(currentItem);
-                        }
+            while (running || !blockingQueue.isEmpty()) {
+                currentItem = blockingQueue.poll(milliSeconds);
+                if (currentItem != null) {
+                    for (Subscriber<T> subscriber : subscribers) {
+                        subscriber.onEvent(currentItem);
                     }
                 }
             }
@@ -72,5 +70,11 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T> {
     @Override
     public void shutdown() {
         running = false;
+        try {
+            poolWorkerThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }

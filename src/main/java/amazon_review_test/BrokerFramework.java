@@ -1,10 +1,6 @@
-package AmazonReviewTest;
+package amazon_review_test;
 
-import AmazonReviewTest.AmazonSubscriber;
-import AmazonReviewTest.NewReviewSubscriber;
-import AmazonReviewTest.OldReviewSubscriber;
-import AmazonReviewTest.Review;
-import Framework.*;
+import framework.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +16,7 @@ public class BrokerFramework {
 
         SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
         AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(3000, 100); // the milliseconds in wait() and queueSize can be modified
-        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30, 100, 3000); // threadpool size, queueSize, and milliseconds can be modified
+        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30); // threadpool size, queueSize, and milliseconds can be modified
 
         try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
             System.out.println("Please input command as the following: \n" +
@@ -51,10 +47,10 @@ public class BrokerFramework {
             System.exit(1);
         }
 
-        Publisher firstFile = new Publisher(first_file_name, broker);
+        ReviewPublisher firstFile = new ReviewPublisher(first_file_name, broker);
         Thread p1 = new Thread(firstFile);
 
-        Publisher secondFile = new Publisher(second_file_name, broker);
+        ReviewPublisher secondFile = new ReviewPublisher(second_file_name, broker);
         Thread p2 = new Thread(secondFile);
 
         AmazonSubscriber<Review> newSub = new NewReviewSubscriber<Review>();
