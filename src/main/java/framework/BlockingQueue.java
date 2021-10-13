@@ -27,12 +27,18 @@ public class BlockingQueue<T> {
      */
     public synchronized T poll(long milliSeconds) {
         if (size == 0) {
+            long start = System.currentTimeMillis();
             try {
                 this.wait(milliSeconds);
             } catch (InterruptedException e) {
-                return pollItem();
+                e.printStackTrace();
             }
-            return null;
+            long end = System.currentTimeMillis();
+            if ((end - start) < milliSeconds) { // should this be less than or equal to?
+                return pollItem();
+            } else {
+                return null;
+            }
         }
         return pollItem();
     }
