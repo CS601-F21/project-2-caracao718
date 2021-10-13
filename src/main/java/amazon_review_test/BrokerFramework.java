@@ -10,36 +10,12 @@ import java.util.Objects;
 public class BrokerFramework {
 
     public static void main(String[] args) {
-        Broker<Review> broker = null;
+        Broker<Review> broker;
         String first_file_name = args[1];
         String second_file_name = args[3];
 
-        SynchronousOrderedDispatchBroker<Review> syncOrderBroker = new SynchronousOrderedDispatchBroker<>();
-        AsyncOrderedDispatchBroker<Review> asyncOrderBroker = new AsyncOrderedDispatchBroker<>(3000, 100); // the milliseconds in wait() and queueSize can be modified
-        AsyncUnorderedDispatchBroker<Review> asyncUnorderBroker = new AsyncUnorderedDispatchBroker<>(30); // threadpool size, queueSize, and milliseconds can be modified
-
-        try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
-            System.out.println("Please input command as the following: \n" +
-                    "SynchronousOrderedDispatchBroker\n" +
-                    "AsyncOrderedDispatchBroker\n" +
-                    "AsyncUnorderedDispatchBroker");
-            String input = readCL.readLine();
-            if (Objects.equals(input, "exit")) {
-                System.exit(0);
-            }
-            System.out.println("Please wait...");
-            switch (input) {
-                case "SynchronousOrderedDispatchBroker" -> broker = syncOrderBroker;
-                case "AsyncOrderedDispatchBroker" -> broker = asyncOrderBroker;
-                case "AsyncUnorderedDispatchBroker" -> broker = asyncUnorderBroker;
-                default -> System.out.println("something wrong with input, please try again");
-            }
-
-        } catch (IOException e) {
-            System.out.println("Something Wrong");
-        }
-
-
+        BrokerFactory brokerFactory = new BrokerFactory();
+        broker = getReviewBroker(null, brokerFactory);
 
         long start = System.currentTimeMillis(); //retrieve current time when starting calculations
 
@@ -47,6 +23,20 @@ public class BrokerFramework {
             System.exit(1);
         }
 
+        instantiatePublishers(broker, first_file_name, second_file_name);
+
+        long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
+        System.out.println("time: " + (end-start));
+
+    }
+
+    /**
+     * A method that instantiate the publishers and start the program
+     * @param broker
+     * @param first_file_name
+     * @param second_file_name
+     */
+    private static void instantiatePublishers(Broker<Review> broker, String first_file_name, String second_file_name) {
         ReviewPublisher firstFile = new ReviewPublisher(first_file_name, broker);
         Thread p1 = new Thread(firstFile);
 
@@ -75,16 +65,34 @@ public class BrokerFramework {
             e.printStackTrace();
         }
 
-        syncOrderBroker.shutdown();
-        asyncOrderBroker.shutdown();
-        asyncUnorderBroker.shutdown();
+        broker.shutdown();
         newSub.closePrintWriter();
         oldSub.closePrintWriter();
+    }
 
+    /**
+     * A method that reads in the broker name from the command line, then instantiate a new broker
+     * @param broker
+     * @param brokerFactory
+     * @return
+     */
+    private static Broker<Review> getReviewBroker(Broker<Review> broker, BrokerFactory brokerFactory) {
+        try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
+            System.out.println("Please input command as the following: \n" +
+                    "SynchronousOrderedDispatchBroker\n" +
+                    "AsyncOrderedDispatchBroker\n" +
+                    "AsyncUnorderedDispatchBroker");
+            String input = readCL.readLine();
+            if (Objects.equals(input, "exit")) {
+                System.exit(0);
+            }
+            System.out.println("Please wait...");
+            broker = brokerFactory.getBroker(input);
 
-        long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
-        System.out.println("time: " + (end-start));
-
+        } catch (IOException e) {
+            System.out.println("Something Wrong");
+        }
+        return broker;
     }
 
 }
