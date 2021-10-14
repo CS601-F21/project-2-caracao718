@@ -1,26 +1,31 @@
 package amazon_review_test;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import framework.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Objects;
+
 
 public class BrokerFramework {
 
     public static JsonConfig config;
-    public static String first_file_name;
-    public static String second_file_name;
 
     public static void main(String[] args) {
-        Broker<Review> broker;
-        first_file_name = args[1];
-        second_file_name = args[3];
-        configInput();
+
+        String inputFile = args[1];
+        String line;
+        try (BufferedReader reader = new BufferedReader(new java.io.FileReader(inputFile))){
+            Gson gson = new Gson();
+            while ((line = reader.readLine()) != null)
+            config = gson.fromJson(line, JsonConfig.class);
+        } catch (JsonSyntaxException | IOException e) {
+            e.printStackTrace();
+        }
 
         BrokerFactory brokerFactory = new BrokerFactory();
-        broker = brokerFactory.getBroker(config.getBrokerName());
+        Broker<Review> broker = brokerFactory.getBroker(config.getBrokerName());
 
         long start = System.currentTimeMillis(); //retrieve current time when starting calculations
 
@@ -73,26 +78,5 @@ public class BrokerFramework {
         oldSub.closePrintWriter();
     }
 
-    /**
-     * A method that reads in the broker name from the command line, and config all the inputs
-     * @return
-     */
-    private static void configInput() {
-        try (BufferedReader readCL = new BufferedReader(new InputStreamReader(System.in))) {
-            System.out.println("Please input command as the following: \n" +
-                    "SynchronousOrderedDispatchBroker\n" +
-                    "AsyncOrderedDispatchBroker\n" +
-                    "AsyncUnorderedDispatchBroker");
-            String input = readCL.readLine();
-            if (Objects.equals(input, "exit")) {
-                System.exit(0);
-            }
-            System.out.println("Please wait...");
-            config = new JsonConfig(first_file_name, second_file_name,"newOutput", "oldOutPut", input);
-
-        } catch (IOException e) {
-            System.out.println("Something Wrong");
-        }
-    }
 
 }

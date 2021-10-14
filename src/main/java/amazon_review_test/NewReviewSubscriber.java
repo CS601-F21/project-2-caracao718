@@ -17,7 +17,7 @@ public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
     private PrintWriter writer1 = null;
     {
         try {
-            writer1 = new PrintWriter(new File(config.getOutput1()));
+            writer1 = new PrintWriter(new File(config.getOutPut1()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
