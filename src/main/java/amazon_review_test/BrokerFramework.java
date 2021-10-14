@@ -7,7 +7,6 @@ import framework.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-
 public class BrokerFramework {
 
     public static JsonConfig config;
@@ -15,14 +14,7 @@ public class BrokerFramework {
     public static void main(String[] args) {
 
         String inputFile = args[1];
-        String line;
-        try (BufferedReader reader = new BufferedReader(new java.io.FileReader(inputFile))){
-            Gson gson = new Gson();
-            while ((line = reader.readLine()) != null)
-            config = gson.fromJson(line, JsonConfig.class);
-        } catch (JsonSyntaxException | IOException e) {
-            e.printStackTrace();
-        }
+        configFile(inputFile);
 
         BrokerFactory brokerFactory = new BrokerFactory();
         Broker<Review> broker = brokerFactory.getBroker(config.getBrokerName());
@@ -38,6 +30,21 @@ public class BrokerFramework {
         long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
         System.out.println("time: " + (end-start));
 
+    }
+
+    /**
+     * A method that configs the input json file.
+     * @param inputFile
+     */
+    private static void configFile(String inputFile) {
+        String line;
+        try (BufferedReader reader = new BufferedReader(new java.io.FileReader(inputFile))){
+            Gson gson = new Gson();
+            while ((line = reader.readLine()) != null)
+            config = gson.fromJson(line, JsonConfig.class);
+        } catch (JsonSyntaxException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
