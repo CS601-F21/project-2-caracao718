@@ -1,4 +1,4 @@
-package Framework;
+package framework;
 
 /**
  * A class that implements the BlockingQueue
@@ -22,19 +22,32 @@ public class BlockingQueue<T> {
     }
 
     /**
-     * A method that polls from the waiting queue. If the queue is empty, then the method returns without waiting.
+     * A method that polls from the waiting queue. If the queue is empty, then the method waits for milliseconds, then return null, or polls from the queue.
      * @return
      */
     public synchronized T poll(long milliSeconds) {
         if (size == 0) {
+            long start = System.currentTimeMillis();
             try {
                 this.wait(milliSeconds);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return null;
+            long end = System.currentTimeMillis();
+            if ((end - start) < milliSeconds && (size != 0)) {
+                return pollItem();
+            } else {
+                return null;
+            }
         }
+        return pollItem();
+    }
 
+    /**
+     * A method that polls one item out of the queue, without checking if the queue is empty. Only use this method if already checked the size of the queue
+     * @return
+     */
+    private T pollItem() {
         T item = items[start];
         start = (start+1)%items.length;
         size--;
@@ -45,7 +58,6 @@ public class BlockingQueue<T> {
         if(size == items.length-1) {
             this.notifyAll();
         }
-
         return item;
     }
 

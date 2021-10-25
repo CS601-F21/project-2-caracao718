@@ -1,40 +1,41 @@
-import Framework.Review;
-import Framework.Subscriber;
+package amazon_review_test;
 
 import java.io.*;
 
+import static amazon_review_test.BrokerFramework.config;
+
 /**
- * A class that subscribes only to the old reviews
+ * A class that subscribes only to the new reviews
  * @param <T>
  */
-public class OldReviewSubscriber<T> implements AmazonSubscriber<T> {
+public class NewReviewSubscriber<T> implements AmazonSubscriber<T> {
     private long unixTime;
 
     /**
      * PrintWriter reference: https://www.javatpoint.com/java-printwriter-class
      */
-    private PrintWriter writer2 = null;
+    private PrintWriter writer1 = null;
     {
         try {
-            writer2 = new PrintWriter(new File("oldOutput.json"));
+            writer1 = new PrintWriter(new File(config.getOutPut1()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * A method that filters out the older items and print it to the output file
+     * A method that filters out the newer items and print it to the output file
      * @param item
      */
     @Override
     public void onEvent(T item) {
         // get the unixTime
         unixTime = ((Review)item).getUnixReviewTime();
-        // if the unixTime is less than 1362268800
-        if (unixTime < 1362268800) {
+        // if the unixTime is more than 1362268800
+        if (unixTime >= 1362268800) {
             // write the line in the output file
-            writer2.print(item);
-            writer2.flush();
+            writer1.print(item);
+            writer1.flush();
         }
     }
 
@@ -43,6 +44,6 @@ public class OldReviewSubscriber<T> implements AmazonSubscriber<T> {
      */
     @Override
     public void closePrintWriter() {
-        writer2.close();
+        writer1.close();
     }
 }

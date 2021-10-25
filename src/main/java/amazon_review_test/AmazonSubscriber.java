@@ -1,4 +1,6 @@
-import Framework.Subscriber;
+package amazon_review_test;
+
+import framework.Subscriber;
 
 public interface AmazonSubscriber<T> extends Subscriber<T> {
     /**
